@@ -317,7 +317,7 @@ pfType ns ps (n, rs) =
                 -- type synonyms are always treated as constants
                 TyConI (TySynD t _ _) ->
                   conT ''K `appT` foldl appT (conT t) (map varT rs)
-                _ -> error "unknown construct"
+                c -> error $ "unknown construct: " ++ show c
       appT (appT (conT ''(:>:)) b) (foldl appT (conT $ remakeName n) (map varT rs))
   where
     sum :: Q Type -> Q Type -> Q Type
@@ -396,7 +396,7 @@ mkFrom ns m i n =
                   zipWith (fromCon wrapE ns dn (length cs)) [0..] cs
                 TyConI (TySynD t _ _) ->
                   [clause [conP dn [], varP (field 0)] (normalB (wrapE $ conE 'K `appE` varE (field 0))) []]
-                _ -> error "unknown construct"
+                c -> error $ "unknown construct: " ++ show c
       return b
 
 mkTo :: [Name] -> Int -> Int -> Name -> Q [Q Clause]
@@ -415,7 +415,7 @@ mkTo ns m i n =
                   zipWith (toCon wrapP ns dn (length cs)) [0..] cs
                 TyConI (TySynD t _ _) ->
                   [clause [conP dn [], wrapP $ conP 'K [varP (field 0)]] (normalB $ varE (field 0)) []]
-                _ -> error "unknown construct"
+                c -> error $ "unknown construct: " ++ show c
       return b
 
 mkProof :: Name -> Q Dec
